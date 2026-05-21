@@ -1,0 +1,119 @@
+import { useState, useEffect } from "react";
+import { Outlet, Link, useLocation } from "react-router";
+import { Menu, X } from "lucide-react";
+import { sans, NAV_LINKS } from "./data";
+
+export default function Root() {
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const location = useLocation();
+
+  useEffect(() => {
+    const handler = () => setScrolled(window.scrollY > 32);
+    window.addEventListener("scroll", handler, { passive: true });
+    return () => window.removeEventListener("scroll", handler);
+  }, []);
+
+  // Close mobile menu on route change
+  useEffect(() => {
+    setMenuOpen(false);
+    window.scrollTo({ top: 0 });
+  }, [location.pathname]);
+
+  const isActive = (href: string) => {
+    if (href === "/") return location.pathname === "/";
+    return location.pathname.startsWith(href);
+  };
+
+  return (
+    <div className="min-h-screen bg-background text-foreground" style={sans}>
+      {/* ── Navigation ── */}
+      <header
+        className={`fixed top-0 inset-x-0 z-50 transition-all duration-300 ${
+          scrolled
+            ? "bg-background/96 backdrop-blur-md border-b border-border"
+            : ""
+        }`}
+      >
+        <div className="max-w-6xl mx-auto px-6 lg:px-12 h-[60px] flex items-center justify-between">
+          <Link to="/" className="flex items-center gap-3">
+            <img src="/logo.svg" alt="Shreesh Singh" className="h-6 w-auto" />
+            <span className="sr-only">Shreesh Singh</span>
+          </Link>
+
+          <div className="flex items-center gap-6">
+            <nav className="hidden md:flex items-center gap-10">
+              {NAV_LINKS.map((link) => (
+                <Link
+                  key={link.label}
+                  to={link.href}
+                  className={`text-[11px] tracking-[0.18em] uppercase transition-colors duration-200 ${
+                    isActive(link.href) && link.href !== "/#contact"
+                      ? "text-foreground"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  {link.label}
+                </Link>
+              ))}
+            </nav>
+
+            <a
+              href="https://www.dropbox.com/scl/fi/8is8bk32b16514vuthiy0/Shreesh_Singh_Design_Lead.pdf?rlkey=3hyip2ebpv9heogv59bsecxgh&st=bhiptzfe&dl=1"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hidden md:inline-flex items-center gap-2 text-xs tracking-[0.18em] uppercase bg-foreground text-background px-7 py-4 hover:opacity-80 transition-opacity"
+            >
+              Download Resume
+            </a>
+
+            <button
+              onClick={() => setMenuOpen((o) => !o)}
+              className="md:hidden text-foreground"
+              aria-label="Toggle menu"
+            >
+              {menuOpen ? <X size={18} /> : <Menu size={18} />}
+            </button>
+          </div>
+        </div>
+
+        {menuOpen && (
+          <div className="md:hidden bg-background border-b border-border px-6 pb-5 pt-1 flex flex-col gap-5">
+            {NAV_LINKS.map((link) => (
+              <Link
+                key={link.label}
+                to={link.href}
+                className="text-[11px] tracking-[0.18em] uppercase text-muted-foreground hover:text-foreground text-left transition-colors"
+              >
+                {link.label}
+              </Link>
+            ))}
+            <a
+              href="https://www.dropbox.com/scl/fi/8is8bk32b16514vuthiy0/Shreesh_Singh_Design_Lead.pdf?rlkey=3hyip2ebpv9heogv59bsecxgh&st=bhiptzfe&dl=1"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 text-xs tracking-[0.18em] uppercase bg-foreground text-background px-7 py-4 hover:opacity-80 transition-opacity"
+            >
+              Download Resume
+            </a>
+          </div>
+        )}
+      </header>
+
+      {/* ── Page content ── */}
+      <Outlet />
+
+      {/* ── Footer ── */}
+      <footer className="border-t border-border py-7 px-6 lg:px-12">
+        <div className="max-w-6xl mx-auto flex flex-wrap justify-between items-center gap-3">
+          <p className="text-[11px] tracking-[0.18em] uppercase text-muted-foreground">
+            Shreesh Singh © 2025
+          </p>
+          <p className="text-[11px] tracking-[0.12em] uppercase text-muted-foreground">
+            Visual & UI Design Lead · Noida, India
+          </p>
+        </div>
+      </footer>
+    </div>
+  );
+}

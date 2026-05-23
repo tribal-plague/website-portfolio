@@ -187,6 +187,7 @@ export type Project = {
   thumb: string;
   images: string[];
   featured: boolean;
+  uploadDate?: string;
 };
 
 export const PROJECTS: Project[] = [

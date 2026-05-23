@@ -1,16 +1,9 @@
 import { useState } from "react";
 import { Link } from "react-router";
 import { ArrowUpRight } from "lucide-react";
-import { serifItalic, serif, PROJECTS, type Project, type ProjectCategory } from "../data";
+import { serifItalic, serif, type Project } from "../data";
+import { getAllProjects } from "../lib/cms";
 
-const CATEGORIES: ProjectCategory[] = [
-  "All",
-  "UI Design",
-  "Branding",
-  "Campaign",
-  "Motion",
-  "Illustration",
-];
 
 const PAGE_SIZE = 6;
 const LOAD_MORE_COUNT = 3;
@@ -54,22 +47,13 @@ function ProjectCard({ project }: { project: Project }) {
   );
 }
 
+
 export default function Portfolio() {
-  const [activeCategory, setActiveCategory] = useState<ProjectCategory>("All");
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+  const [allProjects] = useState(() => getAllProjects());
 
-  const filtered =
-    activeCategory === "All"
-      ? PROJECTS
-      : PROJECTS.filter((p) => p.category === activeCategory);
-
-  const visible = filtered.slice(0, visibleCount);
-  const hasMore = visibleCount < filtered.length;
-
-  const handleFilter = (cat: ProjectCategory) => {
-    setActiveCategory(cat);
-    setVisibleCount(PAGE_SIZE);
-  };
+  const visible = allProjects.slice(0, visibleCount);
+  const hasMore = visibleCount < allProjects.length;
 
   return (
     <>
@@ -94,38 +78,7 @@ export default function Portfolio() {
         </p>
       </section>
 
-      {/* ── Filter bar ── */}
-      <section className="border-t border-border px-6 lg:px-12 sticky top-[60px] z-40 bg-background/95 backdrop-blur-md">
-        <div className="max-w-6xl mx-auto flex items-center gap-0 overflow-x-auto scrollbar-none py-0">
-          {CATEGORIES.map((cat) => {
-            const count =
-              cat === "All"
-                ? PROJECTS.length
-                : PROJECTS.filter((p) => p.category === cat).length;
-            const isActive = activeCategory === cat;
-            return (
-              <button
-                key={cat}
-                onClick={() => handleFilter(cat)}
-                className={`shrink-0 flex items-center gap-2 px-5 py-4 text-[11px] tracking-[0.18em] uppercase border-b-2 transition-colors duration-150 ${
-                  isActive
-                    ? "border-foreground text-foreground"
-                    : "border-transparent text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                {cat}
-                <span
-                  className={`text-[10px] tabular-nums transition-colors ${
-                    isActive ? "text-foreground/50" : "text-muted-foreground/40"
-                  }`}
-                >
-                  {count}
-                </span>
-              </button>
-            );
-          })}
-        </div>
-      </section>
+      {/* Filter bar removed as requested */}
 
       {/* ── Project grid ── */}
       <section className="px-6 lg:px-12 py-16">
@@ -146,18 +99,18 @@ export default function Portfolio() {
           {hasMore && (
             <div className="flex flex-col items-center gap-3 mt-20 pt-16 border-t border-border">
               <p className="text-[11px] tracking-[0.15em] uppercase text-muted-foreground">
-                Showing {visible.length} of {filtered.length}
+                Showing {visible.length} of {allProjects.length}
               </p>
               {/* Progress bar */}
               <div className="w-32 h-px bg-border overflow-hidden">
                 <div
                   className="h-full bg-foreground transition-all duration-500"
-                  style={{ width: `${(visible.length / filtered.length) * 100}%` }}
+                  style={{ width: `${(visible.length / allProjects.length) * 100}%` }}
                 />
               </div>
               <button
                 onClick={() =>
-                  setVisibleCount((n) => Math.min(n + LOAD_MORE_COUNT, filtered.length))
+                  setVisibleCount((n: number) => Math.min(n + LOAD_MORE_COUNT, allProjects.length))
                 }
                 className="mt-4 inline-flex items-center gap-3 text-xs tracking-[0.18em] uppercase border border-border px-8 py-4 hover:bg-foreground hover:text-background hover:border-foreground transition-colors duration-200"
               >
@@ -166,10 +119,10 @@ export default function Portfolio() {
             </div>
           )}
 
-          {!hasMore && filtered.length > PAGE_SIZE && (
+          {!hasMore && allProjects.length > PAGE_SIZE && (
             <div className="mt-20 pt-16 border-t border-border text-center">
               <p className="text-[11px] tracking-[0.15em] uppercase text-muted-foreground">
-                All {filtered.length} projects shown
+                All {allProjects.length} projects shown
               </p>
             </div>
           )}

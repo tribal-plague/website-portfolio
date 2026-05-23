@@ -1,6 +1,7 @@
 import { Link } from "react-router";
 import { ArrowUpRight } from "lucide-react";
-import { serifItalic, serif, EXPERIENCES, STATS, CONTACT, FEATURED_PROJECTS } from "../data";
+import { serifItalic, serif, EXPERIENCES, STATS, CONTACT } from "../data";
+import { getAllProjects } from "../lib/cms";
 
 export default function Home() {
   return (
@@ -95,7 +96,7 @@ export default function Home() {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-10">
-            {FEATURED_PROJECTS.map((project) => (
+            {getAllProjects().slice(0, 3).map((project) => (
               <Link
                 key={project.id}
                 to={`/portfolio/${project.id}`}

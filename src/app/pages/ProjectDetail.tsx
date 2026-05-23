@@ -10,7 +10,8 @@ import {
   MessageCircle,
   Check,
 } from "lucide-react";
-import { serifItalic, serif, PROJECTS } from "../data";
+import { serifItalic, serif } from "../data";
+import { getAllProjects, getProjectById } from "../lib/cms";
 
 /* ── Share helpers ── */
 function buildShareUrl(path: string) {
@@ -115,7 +116,7 @@ export default function ProjectDetail() {
   const navigate = useNavigate();
   const projectId = Number(id);
 
-  const project = PROJECTS.find((p) => p.id === projectId);
+  const project = getProjectById(projectId);
 
   if (!project) {
     return (
@@ -133,9 +134,10 @@ export default function ProjectDetail() {
     );
   }
 
-  const currentIndex = PROJECTS.findIndex((p) => p.id === projectId);
-  const prevProject = PROJECTS[currentIndex - 1] ?? null;
-  const nextProject = PROJECTS[currentIndex + 1] ?? null;
+  const allProjects = getAllProjects();
+  const currentIndex = allProjects.findIndex((p) => p.id === projectId);
+  const prevProject = allProjects[currentIndex - 1] ?? null;
+  const nextProject = allProjects[currentIndex + 1] ?? null;
 
   return (
     <>

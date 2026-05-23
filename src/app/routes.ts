@@ -6,6 +6,7 @@ import Experience from "./pages/Experience";
 import Contact from "./pages/Contact";
 import Portfolio from "./pages/Portfolio";
 import ProjectDetail from "./pages/ProjectDetail";
+import Admin from "./pages/Admin";
 
 export const router = createBrowserRouter([
   {
@@ -20,4 +21,6 @@ export const router = createBrowserRouter([
       { path: "contact", Component: Contact },
     ],
   },
+  // Admin lives outside Root — no site header/footer
+  { path: "/admin", Component: Admin },
 ]);

@@ -1,6 +1,6 @@
 import { useState, type KeyboardEvent } from "react";
 import { Link } from "react-router";
-import { Plus, Trash2, X, Pencil, ArrowLeft, Eye, Save } from "lucide-react";
+import { Plus, Trash2, X, Pencil, ArrowLeft, Eye, Save, Copy, Check } from "lucide-react";
 import {
   getCMSProjects,
   upsertCMSProject,
@@ -250,6 +250,43 @@ function ImageRow({
   );
 }
 
+// ── Export helper ────────────────────────────────────────────────────────────
+
+function generateEntry(p: Project): string {
+  const q = (s: string) => `"${s.replace(/\\/g, "\\\\").replace(/"/g, '\\"')}"`;
+  const strArr = (arr: string[]) =>
+    arr.length === 0
+      ? "[]"
+      : `[\n${arr.map((s) => `      ${q(s)}`).join(",\n")},\n    ]`;
+  const longDesc =
+    p.longDescription.length === 0
+      ? "[]"
+      : `[\n${p.longDescription.map((s) => `      ${q(s)}`).join(",\n")},\n    ]`;
+  const outcomes =
+    p.outcomes.length === 0
+      ? "[]"
+      : `[\n${p.outcomes
+          .map((o) => `      { value: ${q(o.value)}, label: ${q(o.label)} }`)
+          .join(",\n")},\n    ]`;
+
+  return `  {
+    id: ${p.id},
+    title: ${q(p.title)},
+    category: "${p.category}",
+    company: ${q(p.company)},
+    year: ${q(p.year)},
+    role: ${q(p.role)},
+    description: ${q(p.description)},
+    longDescription: ${longDesc},
+    outcomes: ${outcomes},
+    skills: ${strArr(p.skills)},
+    tools: ${strArr(p.tools)},
+    thumb: ${q(p.thumb)},
+    images: ${strArr(p.images)},
+    featured: false,
+  },`;
+}
+
 // ── Admin page ───────────────────────────────────────────────────────────────
 
 export default function Admin() {
@@ -259,6 +296,7 @@ export default function Admin() {
   const [form, setForm] = useState<FormData>(DEFAULT_FORM);
   const [toast, setToast] = useState("");
   const [deleteConfirm, setDeleteConfirm] = useState<number | null>(null);
+  const [copiedId, setCopiedId] = useState<number | null>(null);
   const [errors, setErrors] = useState<string[]>([]);
 
   const refresh = () => setCmsProjects(getCMSProjects());
@@ -286,6 +324,12 @@ export default function Admin() {
     setEditingId(p.id);
     setErrors([]);
     setView("form");
+  };
+
+  const copyEntry = async (p: Project) => {
+    await navigator.clipboard.writeText(generateEntry(p));
+    setCopiedId(p.id);
+    setTimeout(() => setCopiedId(null), 2000);
   };
 
   const handleDelete = (id: number) => {
@@ -358,11 +402,22 @@ export default function Admin() {
               Project Manager
             </h1>
             <p className="text-[13px] text-muted-foreground max-w-lg leading-relaxed">
-              Projects added here are stored in your browser (localStorage) and
-              appear at the top of your portfolio. To make them permanent, paste
-              the generated entries into{" "}
-              <code className="text-foreground text-[12px]">data.ts</code>.
+              Fill in a project below, then click{" "}
+              <strong className="text-foreground font-semibold">Copy entry</strong>{" "}
+              to get the ready-to-paste TypeScript code. Add it to the{" "}
+              <code className="text-foreground text-[12px]">PROJECTS</code> array
+              in <code className="text-foreground text-[12px]">data.ts</code>, push
+              to git, and Vercel deploys it permanently for all visitors.
             </p>
+            <div className="mt-5 border border-border p-4 max-w-lg">
+              <p className="text-[10px] tracking-[0.2em] uppercase text-muted-foreground mb-2">Workflow</p>
+              <ol className="text-[12px] text-muted-foreground space-y-1 list-none">
+                <li>1 — Fill the form &amp; save</li>
+                <li>2 — Click <strong className="text-foreground">Copy entry</strong> on the project row</li>
+                <li>3 — Paste into the <code className="text-foreground">PROJECTS</code> array in <code className="text-foreground">data.ts</code></li>
+                <li>4 — Push to git → Vercel redeploys → live for everyone</li>
+              </ol>
+            </div>
           </div>
 
           {/* CMS projects */}
@@ -437,6 +492,17 @@ export default function Admin() {
                       >
                         <Eye size={11} /> View
                       </Link>
+                      <button
+                        onClick={() => copyEntry(p)}
+                        className={`inline-flex items-center gap-1.5 text-[10px] tracking-[0.15em] uppercase border px-3 py-1.5 transition-colors ${
+                          copiedId === p.id
+                            ? "border-foreground text-foreground bg-foreground/5"
+                            : "border-border text-muted-foreground hover:text-foreground hover:border-foreground"
+                        }`}
+                      >
+                        {copiedId === p.id ? <Check size={11} /> : <Copy size={11} />}
+                        {copiedId === p.id ? "Copied!" : "Copy entry"}
+                      </button>
                       <button
                         onClick={() => startEdit(p)}
                         className="inline-flex items-center gap-1.5 text-[10px] tracking-[0.15em] uppercase border border-border px-3 py-1.5 text-muted-foreground hover:text-foreground hover:border-foreground transition-colors"

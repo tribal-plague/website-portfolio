@@ -11,7 +11,7 @@ import {
   Check,
 } from "lucide-react";
 import { serifItalic, serif } from "../data";
-import { getAllProjects, getProjectById } from "../lib/cms";
+import { useProject, useProjects } from "../hooks/useProjects";
 
 /* ── Share helpers ── */
 function buildShareUrl(path: string) {
@@ -116,7 +116,21 @@ export default function ProjectDetail() {
   const navigate = useNavigate();
   const projectId = Number(id);
 
-  const project = getProjectById(projectId);
+  const { project, loading: projectLoading } = useProject(projectId);
+  const { projects: allProjects, loading: listLoading } = useProjects();
+  const loading = projectLoading || listLoading;
+
+  const currentIndex = allProjects.findIndex((p) => p.id === projectId);
+  const prevProject = allProjects[currentIndex - 1] ?? null;
+  const nextProject = allProjects[currentIndex + 1] ?? null;
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-border border-t-foreground rounded-full animate-spin" />
+      </div>
+    );
+  }
 
   if (!project) {
     return (
@@ -133,11 +147,6 @@ export default function ProjectDetail() {
       </div>
     );
   }
-
-  const allProjects = getAllProjects();
-  const currentIndex = allProjects.findIndex((p) => p.id === projectId);
-  const prevProject = allProjects[currentIndex - 1] ?? null;
-  const nextProject = allProjects[currentIndex + 1] ?? null;
 
   return (
     <>

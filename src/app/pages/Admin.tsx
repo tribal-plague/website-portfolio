@@ -1,12 +1,14 @@
-import { useState, type KeyboardEvent } from "react";
+import { useState, useEffect, useRef, type KeyboardEvent, type DragEvent } from "react";
 import { Link } from "react-router";
-import { Plus, Trash2, X, Pencil, ArrowLeft, Eye, Save, Copy, Check } from "lucide-react";
+import { Plus, Trash2, X, Pencil, ArrowLeft, Eye, Save, Copy, Check, Loader2, Upload, Link2 } from "lucide-react";
 import {
   getCMSProjects,
   upsertCMSProject,
   deleteCMSProject,
   nextCMSId,
+  uploadImage,
 } from "../lib/cms";
+import { isSanityConfigured } from "../../sanity/client";
 import { PROJECTS, type Project } from "../data";
 
 // ── Constants ────────────────────────────────────────────────────────────────
@@ -195,7 +197,7 @@ function TagInput({
   );
 }
 
-// ── Image URL row with preview ───────────────────────────────────────────────
+// ── Image upload row ─────────────────────────────────────────────────────────
 
 function ImageRow({
   url,
@@ -210,33 +212,108 @@ function ImageRow({
   onChange: (v: string) => void;
   onRemove: () => void;
 }) {
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = useState(false);
+  const [urlMode, setUrlMode] = useState(false);
+  const [dragOver, setDragOver] = useState(false);
+
+  const handleFile = async (file: File) => {
+    if (!file.type.startsWith("image/")) return;
+    setUploading(true);
+    try {
+      const hosted = await uploadImage(file);
+      onChange(hosted);
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const onFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) handleFile(file);
+    e.target.value = "";
+  };
+
+  const onDrop = (e: DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setDragOver(false);
+    const file = e.dataTransfer.files?.[0];
+    if (file) handleFile(file);
+  };
+
   return (
     <div className="flex gap-4 items-start">
-      <div className="shrink-0 w-20 h-16 bg-accent border border-border overflow-hidden flex items-center justify-center">
-        {url ? (
-          <img
-            src={url}
-            alt=""
-            className="w-full h-full object-cover"
-            onError={(e) => {
-              (e.currentTarget as HTMLImageElement).style.opacity = "0";
-            }}
-          />
+      {/* Drop zone / preview */}
+      <div
+        className={`relative shrink-0 w-28 h-20 border overflow-hidden flex flex-col items-center justify-center cursor-pointer transition-colors ${
+          dragOver
+            ? "border-foreground bg-foreground/5"
+            : "border-dashed border-border bg-accent hover:border-foreground/50"
+        }`}
+        onClick={() => !uploading && fileRef.current?.click()}
+        onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+        onDragLeave={() => setDragOver(false)}
+        onDrop={onDrop}
+      >
+        {uploading ? (
+          <Loader2 size={18} className="animate-spin text-muted-foreground" />
+        ) : url ? (
+          <>
+            <img
+              src={url}
+              alt=""
+              className="w-full h-full object-cover"
+              onError={(e) => { (e.currentTarget as HTMLImageElement).style.opacity = "0"; }}
+            />
+            <div className="absolute inset-0 bg-background/0 hover:bg-background/50 transition-colors flex items-center justify-center opacity-0 hover:opacity-100">
+              <Upload size={14} className="text-foreground" />
+            </div>
+          </>
         ) : (
-          <span className="text-[9px] tracking-[0.15em] uppercase text-muted-foreground/30">
-            Preview
-          </span>
+          <>
+            <Upload size={14} className="text-muted-foreground/50 mb-1" />
+            <span className="text-[8px] tracking-[0.12em] uppercase text-muted-foreground/40 text-center px-1">
+              {dragOver ? "Drop here" : "Click or drag"}
+            </span>
+          </>
         )}
-      </div>
-      <div className="flex-1 flex flex-col gap-1.5">
-        <FieldLabel label={label} />
         <input
-          value={url}
-          onChange={(e) => onChange(e.target.value)}
-          placeholder="https://images.unsplash.com/..."
-          className={inputCls}
+          ref={fileRef}
+          type="file"
+          accept="image/*"
+          className="hidden"
+          onChange={onFileInput}
         />
       </div>
+
+      {/* URL input or toggle */}
+      <div className="flex-1 flex flex-col gap-2 min-w-0">
+        <div className="flex items-center justify-between">
+          <FieldLabel label={label} />
+          <button
+            type="button"
+            onClick={() => setUrlMode((v) => !v)}
+            className="text-[9px] tracking-[0.12em] uppercase text-muted-foreground/50 hover:text-muted-foreground transition-colors flex items-center gap-1"
+          >
+            <Link2 size={9} />
+            {urlMode ? "Hide URL" : "Paste URL"}
+          </button>
+        </div>
+
+        {urlMode && (
+          <input
+            value={url}
+            onChange={(e) => onChange(e.target.value)}
+            placeholder="https://..."
+            className={inputCls}
+          />
+        )}
+
+        {url && !urlMode && (
+          <p className="text-[10px] text-muted-foreground/50 truncate">{url}</p>
+        )}
+      </div>
+
       {canRemove && (
         <button
           type="button"
@@ -292,21 +369,29 @@ function generateEntry(p: Project): string {
 export default function Admin() {
   const [view, setView] = useState<"list" | "form">("list");
   const [editingId, setEditingId] = useState<number | null>(null);
-  const [cmsProjects, setCmsProjects] = useState(() => getCMSProjects());
+  const [cmsProjects, setCmsProjects] = useState<Project[]>([]);
+  const [listLoading, setListLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const [form, setForm] = useState<FormData>(DEFAULT_FORM);
   const [toast, setToast] = useState("");
   const [deleteConfirm, setDeleteConfirm] = useState<number | null>(null);
   const [copiedId, setCopiedId] = useState<number | null>(null);
   const [errors, setErrors] = useState<string[]>([]);
 
-  const refresh = () => setCmsProjects(getCMSProjects());
+  const refresh = async () => {
+    setListLoading(true);
+    const data = await getCMSProjects();
+    setCmsProjects(data);
+    setListLoading(false);
+  };
+
+  useEffect(() => { refresh(); }, []);
 
   const flash = (msg: string) => {
     setToast(msg);
     setTimeout(() => setToast(""), 3000);
   };
 
-  // Set a single form field
   const set = <K extends keyof FormData>(key: K, val: FormData[K]) =>
     setForm((f) => ({ ...f, [key]: val }));
 
@@ -332,16 +417,18 @@ export default function Admin() {
     setTimeout(() => setCopiedId(null), 2000);
   };
 
-  const handleDelete = (id: number) => {
-    deleteCMSProject(id);
-    refresh();
+  const handleDelete = async (id: number) => {
+    setSaving(true);
+    await deleteCMSProject(id);
+    await refresh();
+    setSaving(false);
     setDeleteConfirm(null);
     flash("Project deleted.");
   };
 
   // ── Form actions ──
 
-  const handleSave = () => {
+  const handleSave = async () => {
     const errs: string[] = [];
     if (!form.title.trim()) errs.push("Title is required.");
     if (!form.description.trim()) errs.push("Short description is required.");
@@ -351,11 +438,20 @@ export default function Admin() {
       return;
     }
     setErrors([]);
-    const id = editingId ?? nextCMSId();
-    upsertCMSProject(formToProject(form, id));
-    refresh();
-    flash(editingId ? "Project updated." : "Project saved.");
-    setView("list");
+    setSaving(true);
+    try {
+      const id = editingId ?? nextCMSId();
+      await upsertCMSProject(formToProject(form, id));
+      await refresh();
+      flash(editingId ? "Project updated." : "Project saved.");
+      setView("list");
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Save failed.";
+      setErrors([`Sanity error: ${msg}`]);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } finally {
+      setSaving(false);
+    }
   };
 
   // ── LIST VIEW ─────────────────────────────────────────────────────────────
@@ -402,22 +498,20 @@ export default function Admin() {
               Project Manager
             </h1>
             <p className="text-[13px] text-muted-foreground max-w-lg leading-relaxed">
-              Fill in a project below, then click{" "}
-              <strong className="text-foreground font-semibold">Copy entry</strong>{" "}
-              to get the ready-to-paste TypeScript code. Add it to the{" "}
-              <code className="text-foreground text-[12px]">PROJECTS</code> array
-              in <code className="text-foreground text-[12px]">data.ts</code>, push
-              to git, and Vercel deploys it permanently for all visitors.
+              {isSanityConfigured
+                ? <>Projects save directly to <strong className="text-foreground font-semibold">Sanity CMS</strong> and appear live instantly — no code push needed.</>
+                : <>Add and manage portfolio projects. Projects are saved and appear on the site immediately.</>
+              }
             </p>
-            <div className="mt-5 border border-border p-4 max-w-lg">
-              <p className="text-[10px] tracking-[0.2em] uppercase text-muted-foreground mb-2">Workflow</p>
-              <ol className="text-[12px] text-muted-foreground space-y-1 list-none">
-                <li>1 — Fill the form &amp; save</li>
-                <li>2 — Click <strong className="text-foreground">Copy entry</strong> on the project row</li>
-                <li>3 — Paste into the <code className="text-foreground">PROJECTS</code> array in <code className="text-foreground">data.ts</code></li>
-                <li>4 — Push to git → Vercel redeploys → live for everyone</li>
-              </ol>
-            </div>
+            {!isSanityConfigured && (
+              <div className="mt-5 border border-border/50 bg-accent/40 p-4 max-w-lg">
+                <p className="text-[10px] tracking-[0.2em] uppercase text-muted-foreground mb-1.5">Sanity not connected</p>
+                <p className="text-[12px] text-muted-foreground leading-relaxed">
+                  Projects are saved locally in this browser. To access them from anywhere,{" "}
+                  <span className="text-foreground">set up Sanity</span> — see <code className="text-[11px]">.env.example</code> for instructions.
+                </p>
+              </div>
+            )}
           </div>
 
           {/* CMS projects */}
@@ -431,7 +525,19 @@ export default function Admin() {
               </p>
             </div>
 
-            {cmsProjects.length === 0 ? (
+            {listLoading ? (
+              <div className="space-y-3">
+                {Array.from({ length: 3 }).map((_, i) => (
+                  <div key={i} className="flex items-center gap-4 border border-border p-4 animate-pulse">
+                    <div className="shrink-0 w-16 h-12 bg-accent" />
+                    <div className="flex-1 space-y-2">
+                      <div className="h-3 bg-accent w-1/3" />
+                      <div className="h-2.5 bg-accent w-1/4" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : cmsProjects.length === 0 ? (
               <div className="py-16 border border-dashed border-border text-center">
                 <p className="text-muted-foreground text-[13px] mb-5">
                   No projects yet.
@@ -601,9 +707,11 @@ export default function Admin() {
         </span>
         <button
           onClick={handleSave}
-          className="inline-flex items-center gap-2 text-[11px] tracking-[0.15em] uppercase bg-foreground text-background px-5 py-2.5 hover:opacity-80 transition-opacity"
+          disabled={saving}
+          className="inline-flex items-center gap-2 text-[11px] tracking-[0.15em] uppercase bg-foreground text-background px-5 py-2.5 hover:opacity-80 transition-opacity disabled:opacity-50"
         >
-          <Save size={12} /> Save
+          {saving ? <Loader2 size={12} className="animate-spin" /> : <Save size={12} />}
+          {saving ? "Saving…" : "Save"}
         </button>
       </div>
 
@@ -919,10 +1027,11 @@ export default function Admin() {
           <button
             type="button"
             onClick={handleSave}
-            className="inline-flex items-center gap-2 text-[11px] tracking-[0.15em] uppercase bg-foreground text-background px-8 py-3.5 hover:opacity-80 transition-opacity"
+            disabled={saving}
+            className="inline-flex items-center gap-2 text-[11px] tracking-[0.15em] uppercase bg-foreground text-background px-8 py-3.5 hover:opacity-80 transition-opacity disabled:opacity-50"
           >
-            <Save size={12} />
-            {editingId ? "Update Project" : "Save Project"}
+            {saving ? <Loader2 size={12} className="animate-spin" /> : <Save size={12} />}
+            {saving ? "Saving…" : editingId ? "Update Project" : "Save Project"}
           </button>
         </div>
       </div>

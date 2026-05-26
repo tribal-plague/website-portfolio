@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router";
 import { ArrowUpRight } from "lucide-react";
 import { serifItalic, serif, type Project } from "../data";
-import { getAllProjects } from "../lib/cms";
+import { useProjects } from "../hooks/useProjects";
 
 
 const PAGE_SIZE = 6;
@@ -50,7 +50,7 @@ function ProjectCard({ project }: { project: Project }) {
 
 export default function Portfolio() {
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
-  const [allProjects] = useState(() => getAllProjects());
+  const { projects: allProjects, loading } = useProjects();
 
   const visible = allProjects.slice(0, visibleCount);
   const hasMore = visibleCount < allProjects.length;
@@ -83,7 +83,17 @@ export default function Portfolio() {
       {/* ── Project grid ── */}
       <section className="px-6 lg:px-12 py-16">
         <div className="max-w-6xl mx-auto">
-          {visible.length === 0 ? (
+          {loading ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-14">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <div key={i} className="flex flex-col gap-4 animate-pulse">
+                  <div className="bg-accent" style={{ aspectRatio: "4/3" }} />
+                  <div className="h-3 bg-accent w-3/4" />
+                  <div className="h-2.5 bg-accent w-1/3" />
+                </div>
+              ))}
+            </div>
+          ) : visible.length === 0 ? (
             <div className="py-24 text-center">
               <p className="text-muted-foreground text-sm">No projects in this category yet.</p>
             </div>

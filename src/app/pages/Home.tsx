@@ -1,9 +1,11 @@
 import { Link } from "react-router";
 import { ArrowUpRight } from "lucide-react";
 import { serifItalic, serif, EXPERIENCES, STATS, CONTACT } from "../data";
-import { getAllProjects } from "../lib/cms";
+import { useProjects } from "../hooks/useProjects";
 
 export default function Home() {
+  const { projects, loading } = useProjects();
+
   return (
     <>
       {/* ── Hero ── */}
@@ -96,7 +98,15 @@ export default function Home() {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-10">
-            {getAllProjects().slice(0, 3).map((project) => (
+            {loading
+              ? Array.from({ length: 3 }).map((_, i) => (
+                  <div key={i} className="flex flex-col gap-4 animate-pulse">
+                    <div className="bg-accent" style={{ aspectRatio: "4/3" }} />
+                    <div className="h-3 bg-accent w-3/4" />
+                    <div className="h-2.5 bg-accent w-1/3" />
+                  </div>
+                ))
+              : projects.slice(0, 3).map((project) => (
               <Link
                 key={project.id}
                 to={`/portfolio/${project.id}`}

@@ -1,12 +1,21 @@
 import { useState, useEffect } from "react";
 import { Outlet, Link, useLocation } from "react-router";
-import { Menu, X } from "lucide-react";
+import { Menu, X, Moon, Sun } from "lucide-react";
 import { sans, NAV_LINKS } from "./data";
 
 export default function Root() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [isDark, setIsDark] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return localStorage.getItem("theme") === "dark";
+  });
   const location = useLocation();
+
+  useEffect(() => {
+    document.documentElement.classList.toggle("dark", isDark);
+    localStorage.setItem("theme", isDark ? "dark" : "light");
+  }, [isDark]);
 
   useEffect(() => {
     const handler = () => setScrolled(window.scrollY > 32);
@@ -102,6 +111,15 @@ export default function Root() {
 
       {/* ── Page content ── */}
       <Outlet />
+
+      {/* ── Dark mode toggle ── */}
+      <button
+        onClick={() => setIsDark((d) => !d)}
+        aria-label="Toggle dark mode"
+        className="fixed bottom-6 right-6 z-50 w-11 h-11 flex items-center justify-center bg-foreground text-background border border-border hover:opacity-80 transition-opacity shadow-lg"
+      >
+        {isDark ? <Sun size={16} strokeWidth={1.5} /> : <Moon size={16} strokeWidth={1.5} />}
+      </button>
 
       {/* ── Footer ── */}
       <footer className="border-t border-border py-7 px-6 lg:px-12">

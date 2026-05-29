@@ -144,8 +144,18 @@ export async function uploadImage(file: File): Promise<string> {
       reader.readAsDataURL(file);
     });
   }
-  const asset = await writeClient.assets.upload("image", file, {
-    filename: file.name,
-  });
-  return asset.url;
+  try {
+    const asset = await writeClient.assets.upload("image", file, {
+      filename: file.name,
+    });
+    return asset.url;
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    if (msg.toLowerCase().includes("insufficient permissions") || msg.toLowerCase().includes("permission")) {
+      throw new Error(
+        'Sanity token is missing "create" permission. Go to sanity.io/manage → API → Tokens and regenerate with the Editor role.'
+      );
+    }
+    throw err;
+  }
 }

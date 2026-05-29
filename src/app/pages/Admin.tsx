@@ -216,13 +216,38 @@ function ImageRow({
   const [uploading, setUploading] = useState(false);
   const [urlMode, setUrlMode] = useState(false);
   const [dragOver, setDragOver] = useState(false);
+  const [localPreview, setLocalPreview] = useState<string | null>(null);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+
+  // Revoke blob URL when it changes or component unmounts
+  useEffect(() => {
+    if (!localPreview) return;
+    return () => URL.revokeObjectURL(localPreview);
+  }, [localPreview]);
 
   const handleFile = async (file: File) => {
     if (!file.type.startsWith("image/")) return;
+
+    // Show a local preview immediately so the user can see their selection
+    const preview = URL.createObjectURL(file);
+    setLocalPreview(preview);
     setUploading(true);
+    setUploadError(null);
+
     try {
-      const hosted = await uploadImage(file);
+      const hosted = await Promise.race([
+        uploadImage(file),
+        new Promise<never>((_, reject) =>
+          setTimeout(
+            () => reject(new Error("Upload timed out — check your connection and try again")),
+            60000
+          )
+        ),
+      ]);
       onChange(hosted);
+      setLocalPreview(null); // real URL is now set; release the blob
+    } catch (err) {
+      setUploadError(err instanceof Error ? err.message : "Upload failed. Try again.");
     } finally {
       setUploading(false);
     }
@@ -241,6 +266,9 @@ function ImageRow({
     if (file) handleFile(file);
   };
 
+  // While uploading we show the local blob; after success we show the real URL
+  const displayUrl = localPreview ?? url;
+
   return (
     <div className="flex gap-4 items-start">
       {/* Drop zone / preview */}
@@ -255,20 +283,27 @@ function ImageRow({
         onDragLeave={() => setDragOver(false)}
         onDrop={onDrop}
       >
-        {uploading ? (
-          <Loader2 size={18} className="animate-spin text-muted-foreground" />
-        ) : url ? (
+        {displayUrl ? (
           <>
             <img
-              src={url}
+              src={displayUrl}
               alt=""
               className="w-full h-full object-cover"
               onError={(e) => { (e.currentTarget as HTMLImageElement).style.opacity = "0"; }}
             />
-            <div className="absolute inset-0 bg-background/0 hover:bg-background/50 transition-colors flex items-center justify-center opacity-0 hover:opacity-100">
-              <Upload size={14} className="text-foreground" />
-            </div>
+            {uploading ? (
+              // Spinner overlay while the real upload is in progress
+              <div className="absolute inset-0 bg-background/60 flex items-center justify-center">
+                <Loader2 size={18} className="animate-spin text-foreground" />
+              </div>
+            ) : (
+              <div className="absolute inset-0 bg-background/0 hover:bg-background/50 transition-colors flex items-center justify-center opacity-0 hover:opacity-100">
+                <Upload size={14} className="text-foreground" />
+              </div>
+            )}
           </>
+        ) : uploading ? (
+          <Loader2 size={18} className="animate-spin text-muted-foreground" />
         ) : (
           <>
             <Upload size={14} className="text-muted-foreground/50 mb-1" />
@@ -309,8 +344,16 @@ function ImageRow({
           />
         )}
 
-        {url && !urlMode && (
+        {uploadError && (
+          <p className="text-[10px] text-red-400 leading-snug">{uploadError}</p>
+        )}
+
+        {url && !urlMode && !uploadError && (
           <p className="text-[10px] text-muted-foreground/50 truncate">{url}</p>
+        )}
+
+        {uploading && (
+          <p className="text-[10px] text-muted-foreground/50">Uploading…</p>
         )}
       </div>
 

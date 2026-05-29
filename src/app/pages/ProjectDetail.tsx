@@ -168,52 +168,52 @@ export default function ProjectDetail() {
         </div>
       </div>
 
-      {/* ── Project header ── */}
-      <section className="px-6 lg:px-12 pt-16 pb-12 max-w-6xl mx-auto">
-        <div className="flex flex-wrap items-center gap-3 mb-8">
-          <span className="text-[11px] tracking-[0.18em] uppercase border border-border px-3 py-1 text-muted-foreground">
-            {project.category}
-          </span>
-          <span className="text-muted-foreground/40 text-xs">·</span>
-          <span className="text-[11px] tracking-[0.15em] uppercase text-muted-foreground">
-            {project.company}
-          </span>
-          <span className="text-muted-foreground/40 text-xs">·</span>
-          <span className="text-[11px] tracking-[0.15em] text-muted-foreground tabular-nums">
-            {project.year}
-          </span>
-        </div>
+      {/* ── Project header + thumbnail ── */}
+      <section className="px-6 lg:px-12 pt-16 pb-16 max-w-6xl mx-auto">
+        <div className="grid md:grid-cols-2 gap-12 items-start">
+          {/* Left: text */}
+          <div>
+            <div className="flex flex-wrap items-center gap-3 mb-8">
+              <span className="text-[11px] tracking-[0.18em] uppercase border border-border px-3 py-1 text-muted-foreground">
+                {project.category}
+              </span>
+              <span className="text-muted-foreground/40 text-xs">·</span>
+              <span className="text-[11px] tracking-[0.15em] uppercase text-muted-foreground">
+                {project.company}
+              </span>
+              <span className="text-muted-foreground/40 text-xs">·</span>
+              <span className="text-[11px] tracking-[0.15em] text-muted-foreground tabular-nums">
+                {project.year}
+              </span>
+            </div>
 
-        <h1
-          className="font-black uppercase leading-[0.88] tracking-[-0.02em] mb-6"
-          style={{ fontSize: "clamp(2.5rem, 7vw, 6rem)" }}
-        >
-          {project.title}
-        </h1>
+            <h1
+              className="font-black uppercase leading-[0.88] tracking-[-0.02em] mb-6"
+              style={{ fontSize: "clamp(2rem, 5vw, 4rem)" }}
+            >
+              {project.title}
+            </h1>
 
-        <p
-          className="text-lg text-muted-foreground leading-relaxed max-w-2xl"
-          style={serif}
-        >
-          {project.description}
-        </p>
+            <p
+              className="text-lg text-muted-foreground leading-relaxed"
+              style={serif}
+            >
+              {project.description}
+            </p>
 
-        <p className="mt-3 text-[12px] text-muted-foreground/60 tracking-wide" style={serifItalic}>
-          Role: {project.role}
-        </p>
-      </section>
+            <p className="mt-3 text-[12px] text-muted-foreground/60 tracking-wide" style={serifItalic}>
+              Role: {project.role}
+            </p>
+          </div>
 
-      {/* ── Hero image ── */}
-      <section className="px-6 lg:px-12 pb-16 max-w-6xl mx-auto">
-        <div
-          className="w-full overflow-hidden bg-accent"
-          style={{ aspectRatio: "16/9" }}
-        >
-          <img
-            src={project.thumb}
-            alt={project.title}
-            className="w-full h-full object-cover"
-          />
+          {/* Right: thumbnail */}
+          <div>
+            <img
+              src={project.thumb}
+              alt={project.title}
+              className="w-full"
+            />
+          </div>
         </div>
       </section>
 
@@ -239,6 +239,23 @@ export default function ProjectDetail() {
               </p>
             </div>
           ))}
+        </div>
+      </section>
+
+      {/* ── Gallery ── */}
+      <section className="border-t border-border py-20 px-6 lg:px-12">
+        <div className="max-w-6xl mx-auto">
+          <div className="flex flex-col">
+            {project.images.map((src, i) => (
+              <img
+                key={i}
+                src={src}
+                alt={`${project.title} — view ${i + 2}`}
+                loading="lazy"
+                className="w-full"
+              />
+            ))}
+          </div>
         </div>
       </section>
 
@@ -295,31 +312,6 @@ export default function ProjectDetail() {
                 ))}
               </div>
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ── Gallery ── */}
-      <section className="border-t border-border py-20 px-6 lg:px-12">
-        <div className="max-w-6xl mx-auto">
-          <p className="text-[11px] tracking-[0.2em] uppercase text-muted-foreground mb-8">
-            Gallery
-          </p>
-          <div className="grid md:grid-cols-2 gap-4">
-            {project.images.map((src, i) => (
-              <div
-                key={i}
-                className="overflow-hidden bg-accent"
-                style={{ aspectRatio: "4/3" }}
-              >
-                <img
-                  src={src}
-                  alt={`${project.title} — view ${i + 2}`}
-                  loading="lazy"
-                  className="w-full h-full object-cover"
-                />
-              </div>
-            ))}
           </div>
         </div>
       </section>

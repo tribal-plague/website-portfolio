@@ -11,8 +11,9 @@ export default function Home() {
       {/* ── Hero ── */}
       <section
         id="hero"
-        className="min-h-screen flex flex-col justify-center px-6 lg:px-12 pt-24 pb-16 max-w-6xl mx-auto"
+        className="min-h-screen flex flex-col justify-center px-6 lg:px-12 pt-24 pb-16"
       >
+      <div className="max-w-6xl mx-auto w-full">
         {/* Pill badge */}
         <div className="inline-flex items-center gap-2.5 border border-border rounded-full px-4 py-1.5 mb-10 self-start">
           <span className="w-1.5 h-1.5 rounded-full bg-foreground" />
@@ -53,6 +54,7 @@ export default function Home() {
             Portfolio
           </Link>
         </div>
+      </div>
       </section>
 
       {/* ── Featured projects ── */}

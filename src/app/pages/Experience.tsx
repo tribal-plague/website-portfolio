@@ -13,7 +13,8 @@ export default function Experience() {
   return (
     <>
       {/* ── Page header ── */}
-      <section className="pt-36 pb-20 px-6 lg:px-12 max-w-6xl mx-auto">
+      <section className="pt-36 pb-20 px-6 lg:px-12">
+        <div className="max-w-6xl mx-auto">
         <div className="grid md:grid-cols-12 gap-10 items-end">
           <div className="md:col-span-8">
             <p className="text-[11px] tracking-[0.25em] uppercase text-muted-foreground mb-8">
@@ -39,6 +40,7 @@ export default function Experience() {
               moves the needle.
             </p>
           </div>
+        </div>
         </div>
       </section>
 

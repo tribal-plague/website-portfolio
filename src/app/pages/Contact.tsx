@@ -136,24 +136,26 @@ export default function Contact() {
   return (
     <>
       {/* ── Page header ── */}
-      <section className="pt-36 pb-20 px-6 lg:px-12 max-w-6xl mx-auto">
-        <p className="text-[11px] tracking-[0.25em] uppercase text-muted-foreground mb-8">
-          Contact
-        </p>
-        <h1
-          className="font-black uppercase leading-[0.88] tracking-[-0.02em] mb-10"
-          style={{ fontSize: "clamp(3rem, 9vw, 7.5rem)" }}
-        >
-          Let&apos;s start
-          <br />
-          <span className="font-normal" style={serifItalic}>
-            a conversation.
-          </span>
-        </h1>
-        <p className="text-lg text-muted-foreground leading-relaxed max-w-md" style={serif}>
-          Open to design leadership roles, senior IC positions, and select
-          freelance briefs.
-        </p>
+      <section className="pt-36 pb-20 px-6 lg:px-12">
+        <div className="max-w-6xl mx-auto">
+          <p className="text-[11px] tracking-[0.25em] uppercase text-muted-foreground mb-8">
+            Contact
+          </p>
+          <h1
+            className="font-black uppercase leading-[0.88] tracking-[-0.02em] mb-10"
+            style={{ fontSize: "clamp(3rem, 9vw, 7.5rem)" }}
+          >
+            Let&apos;s start
+            <br />
+            <span className="font-normal" style={serifItalic}>
+              a conversation.
+            </span>
+          </h1>
+          <p className="text-lg text-muted-foreground leading-relaxed max-w-md" style={serif}>
+            Open to design leadership roles, senior IC positions, and select
+            freelance briefs.
+          </p>
+        </div>
       </section>
 
       {/* ── Main content: info + form ── */}

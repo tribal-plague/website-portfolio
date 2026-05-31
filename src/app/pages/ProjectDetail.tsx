@@ -152,7 +152,8 @@ export default function ProjectDetail() {
     <>
       {/* ── Top bar: back + share ── */}
       <div className="pt-[60px] border-b border-border">
-        <div className="max-w-6xl mx-auto px-6 lg:px-12 py-4 flex items-center justify-between gap-4 flex-wrap">
+        <div className="px-6 lg:px-12">
+        <div className="max-w-6xl mx-auto py-4 flex items-center justify-between gap-4 flex-wrap">
           <button
             onClick={() => navigate(-1)}
             className="inline-flex items-center gap-2 text-[11px] tracking-[0.18em] uppercase text-muted-foreground hover:text-foreground transition-colors group"
@@ -166,10 +167,12 @@ export default function ProjectDetail() {
 
           <ShareBar title={project.title} description={project.description} />
         </div>
+        </div>
       </div>
 
       {/* ── Project header + thumbnail ── */}
-      <section className="px-6 lg:px-12 pt-16 pb-16 max-w-6xl mx-auto">
+      <section className="px-6 lg:px-12 pt-16 pb-16">
+        <div className="max-w-6xl mx-auto">
         <div className="grid md:grid-cols-2 gap-12 items-start">
           {/* Left: text */}
           <div>
@@ -214,6 +217,7 @@ export default function ProjectDetail() {
               className="w-full"
             />
           </div>
+        </div>
         </div>
       </section>
 

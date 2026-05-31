@@ -44,45 +44,47 @@ export default function Root() {
             : ""
         }`}
       >
-        <div className="max-w-6xl mx-auto px-6 lg:px-12 h-[60px] flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-3">
-            <img src="/logo.svg" alt="Shreesh Singh" className="h-6 w-auto dark:invert" />
-            <span className="sr-only">Shreesh Singh</span>
-          </Link>
+        <div className="px-6 lg:px-12">
+          <div className="max-w-6xl mx-auto h-[60px] flex items-center justify-between">
+            <Link to="/" className="flex items-center gap-3">
+              <img src="/logo.svg" alt="Shreesh Singh" className="h-6 w-auto dark:invert" />
+              <span className="sr-only">Shreesh Singh</span>
+            </Link>
 
-          <div className="flex items-center gap-6">
-            <nav className="hidden md:flex items-center gap-10">
-              {NAV_LINKS.map((link) => (
-                <Link
-                  key={link.label}
-                  to={link.href}
-                  className={`text-[11px] tracking-[0.18em] uppercase transition-colors duration-200 ${
-                    isActive(link.href) && link.href !== "/#contact"
-                      ? "text-foreground"
-                      : "text-muted-foreground hover:text-foreground"
-                  }`}
-                >
-                  {link.label}
-                </Link>
-              ))}
-            </nav>
+            <div className="flex items-center gap-6">
+              <nav className="hidden md:flex items-center gap-10">
+                {NAV_LINKS.map((link) => (
+                  <Link
+                    key={link.label}
+                    to={link.href}
+                    className={`text-[11px] tracking-[0.18em] uppercase transition-colors duration-200 ${
+                      isActive(link.href) && link.href !== "/#contact"
+                        ? "text-foreground"
+                        : "text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    {link.label}
+                  </Link>
+                ))}
+              </nav>
 
-            <a
-              href="https://www.dropbox.com/scl/fi/8is8bk32b16514vuthiy0/Shreesh_Singh_Design_Lead.pdf?rlkey=3hyip2ebpv9heogv59bsecxgh&st=bhiptzfe&dl=1"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hidden md:inline-flex items-center gap-2 text-xs tracking-[0.18em] uppercase bg-foreground text-background px-7 py-4 hover:opacity-80 transition-opacity"
-            >
-              Download Resume
-            </a>
+              <a
+                href="https://www.dropbox.com/scl/fi/8is8bk32b16514vuthiy0/Shreesh_Singh_Design_Lead.pdf?rlkey=3hyip2ebpv9heogv59bsecxgh&st=bhiptzfe&dl=1"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hidden md:inline-flex items-center gap-2 text-xs tracking-[0.18em] uppercase bg-foreground text-background px-7 py-4 hover:opacity-80 transition-opacity"
+              >
+                Download Resume
+              </a>
 
-            <button
-              onClick={() => setMenuOpen((o) => !o)}
-              className="md:hidden text-foreground"
-              aria-label="Toggle menu"
-            >
-              {menuOpen ? <X size={18} /> : <Menu size={18} />}
-            </button>
+              <button
+                onClick={() => setMenuOpen((o) => !o)}
+                className="md:hidden text-foreground"
+                aria-label="Toggle menu"
+              >
+                {menuOpen ? <X size={18} /> : <Menu size={18} />}
+              </button>
+            </div>
           </div>
         </div>
 

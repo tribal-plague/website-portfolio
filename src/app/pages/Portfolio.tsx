@@ -58,24 +58,26 @@ export default function Portfolio() {
   return (
     <>
       {/* ── Page header ── */}
-      <section className="pt-36 pb-20 px-6 lg:px-12 max-w-6xl mx-auto">
-        <p className="text-[11px] tracking-[0.25em] uppercase text-muted-foreground mb-8">
-          Portfolio
-        </p>
-        <h1
-          className="font-black uppercase leading-[0.88] tracking-[-0.02em] mb-10"
-          style={{ fontSize: "clamp(3rem, 9vw, 7.5rem)" }}
-        >
-          Selected
-          <br />
-          <span className="font-normal" style={serifItalic}>
-            work.
-          </span>
-        </h1>
-        <p className="text-lg text-muted-foreground leading-relaxed max-w-lg" style={serif}>
-          A collection of projects spanning UI design, branding, campaign
-          design, motion graphics, and illustration across 7+ years.
-        </p>
+      <section className="pt-36 pb-20 px-6 lg:px-12">
+        <div className="max-w-6xl mx-auto">
+          <p className="text-[11px] tracking-[0.25em] uppercase text-muted-foreground mb-8">
+            Portfolio
+          </p>
+          <h1
+            className="font-black uppercase leading-[0.88] tracking-[-0.02em] mb-10"
+            style={{ fontSize: "clamp(3rem, 9vw, 7.5rem)" }}
+          >
+            Selected
+            <br />
+            <span className="font-normal" style={serifItalic}>
+              work.
+            </span>
+          </h1>
+          <p className="text-lg text-muted-foreground leading-relaxed max-w-lg" style={serif}>
+            A collection of projects spanning UI design, branding, campaign
+            design, motion graphics, and illustration across 7+ years.
+          </p>
+        </div>
       </section>
 
       {/* Filter bar removed as requested */}

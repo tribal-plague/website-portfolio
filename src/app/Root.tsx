@@ -46,7 +46,7 @@ export default function Root() {
       >
         <div className="max-w-6xl mx-auto px-6 lg:px-12 h-[60px] flex items-center justify-between">
           <Link to="/" className="flex items-center gap-3">
-            <img src="/logo.svg" alt="Shreesh Singh" className="h-6 w-auto" />
+            <img src="/logo.svg" alt="Shreesh Singh" className="h-6 w-auto dark:invert" />
             <span className="sr-only">Shreesh Singh</span>
           </Link>
 

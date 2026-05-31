@@ -1,6 +1,6 @@
 import { Link } from "react-router";
 import { ArrowUpRight } from "lucide-react";
-import { serifItalic, serif, EXPERIENCES, STATS, CONTACT } from "../data";
+import { serifItalic, serif, EXPERIENCES, CONTACT } from "../data";
 import { useProjects } from "../hooks/useProjects";
 
 export default function Home() {
@@ -11,70 +11,47 @@ export default function Home() {
       {/* ── Hero ── */}
       <section
         id="hero"
-        className="min-h-screen flex flex-col justify-end px-6 lg:px-12 pt-28 pb-16 max-w-6xl mx-auto"
+        className="min-h-screen flex flex-col justify-center px-6 lg:px-12 pt-24 pb-16 max-w-6xl mx-auto"
       >
-        <p className="text-[11px] tracking-[0.25em] uppercase text-muted-foreground mb-10">
-          Visual & UI Design Lead — Portfolio
-        </p>
+        {/* Pill badge */}
+        <div className="inline-flex items-center gap-2.5 border border-border rounded-full px-4 py-1.5 mb-10 self-start">
+          <span className="w-1.5 h-1.5 rounded-full bg-foreground" />
+          <span className="text-[11px] tracking-[0.2em] uppercase text-muted-foreground">
+            Visual & UI Design Lead
+          </span>
+        </div>
 
+        {/* Headline */}
         <h1
-          className="font-black leading-[0.88] tracking-[-0.02em] uppercase mb-8 text-foreground"
-          style={{ fontSize: "clamp(3.5rem, 11vw, 9.5rem)" }}
+          className="font-black leading-[0.88] tracking-[-0.02em] mb-7 text-foreground"
+          style={{ fontSize: "clamp(3.5rem, 9vw, 7rem)" }}
         >
-          Shreesh
+          Hi. I&apos;m Shreesh,
           <br />
-          Singh
+          and I design stuff.
         </h1>
 
         <p
-          className="text-2xl md:text-3xl text-muted-foreground mb-14 max-w-md leading-snug"
-          style={serifItalic}
+          className="text-lg text-muted-foreground mb-12 max-w-md leading-relaxed"
+          style={serif}
         >
-          Designing with intent,
-          <br />
-          leading with craft.
+          Brands, interfaces, campaigns, motion — crafted across 7+ years and four industries.
         </p>
 
-        {/* Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-y-8 border-t border-border pt-10 mb-12">
-          {STATS.map((s) => (
-            <div key={s.label} className="pr-6">
-              <div
-                className="text-[2.75rem] font-bold leading-none tracking-tight mb-2"
-                style={{ fontVariantNumeric: "tabular-nums" }}
-              >
-                {s.value}
-              </div>
-              <div className="text-[11px] tracking-[0.15em] uppercase text-muted-foreground">
-                {s.label}
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* Contact bar */}
-        <div className="flex flex-wrap items-center gap-x-8 gap-y-3">
-          {[
-            { label: CONTACT.email, href: `mailto:${CONTACT.email}` },
-            { label: "LinkedIn", href: CONTACT.linkedin },
-            { label: "Behance", href: CONTACT.behance },
-          ].map((link) => (
-            <a
-              key={link.label}
-              href={link.href}
-              className="text-xs text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1 group"
-              target={link.href.startsWith("http") ? "_blank" : undefined}
-              rel="noopener noreferrer"
-            >
-              {link.label}
-              <ArrowUpRight
-                size={10}
-                className="opacity-0 group-hover:opacity-100 transition-opacity"
-              />
-            </a>
-          ))}
-          <span className="text-xs text-muted-foreground">{CONTACT.phone}</span>
-          <span className="text-xs text-muted-foreground">{CONTACT.location}</span>
+        {/* CTA buttons */}
+        <div className="flex flex-col sm:flex-row gap-3">
+          <Link
+            to="/contact"
+            className="inline-flex items-center gap-2 text-xs tracking-[0.18em] uppercase bg-foreground text-background px-7 py-4 hover:opacity-80 transition-opacity"
+          >
+            Get in touch <ArrowUpRight size={12} />
+          </Link>
+          <Link
+            to="/portfolio"
+            className="inline-flex items-center gap-2 text-xs tracking-[0.18em] uppercase border border-border px-7 py-4 hover:bg-accent transition-colors"
+          >
+            Portfolio
+          </Link>
         </div>
       </section>
 
@@ -200,7 +177,7 @@ export default function Home() {
 
           {/* Roster rows */}
           <div className="mt-0">
-            {EXPERIENCES.map((exp, i) => (
+            {EXPERIENCES.map((exp) => (
               <Link
                 key={exp.company}
                 to="/experience"

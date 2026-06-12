@@ -130,7 +130,7 @@ export default function Root() {
             Shreesh Singh © 2025
           </p>
           <p className="text-[11px] tracking-[0.12em] uppercase text-muted-foreground">
-            Visual & UI Design Lead · Noida, India
+            Designed and Developed with AI
           </p>
         </div>
       </footer>

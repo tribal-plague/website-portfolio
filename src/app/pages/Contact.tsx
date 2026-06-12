@@ -93,6 +93,8 @@ export default function Contact() {
   const [form, setForm] = useState<FormState>(INITIAL);
   const [submitted, setSubmitted] = useState(false);
   const [sending, setSending] = useState(false);
+  const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+  const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
   const handleChange = (id: keyof FormState, val: string) => {
     setForm((f) => ({ ...f, [id]: val }));
@@ -101,6 +103,14 @@ export default function Contact() {
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setSending(true);
+
+    if (!supabaseUrl || !supabaseAnonKey) {
+      setSending(false);
+      alert(
+        "Supabase is not configured for this project yet. Add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY to your local .env file, then restart Vite."
+      );
+      return;
+    }
 
     const payload = {
       name: form.name,
@@ -111,22 +121,24 @@ export default function Contact() {
     };
 
     try {
-      const res = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/rest/v1/contact_submissions`, {
+      const res = await fetch(new URL("/functions/v1/contact-notification", supabaseUrl).toString(), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "apikey": import.meta.env.VITE_SUPABASE_ANON_KEY,
-          "Authorization": `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
-          "Prefer": "return=representation"
+          Authorization: `Bearer ${supabaseAnonKey}`,
         },
         body: JSON.stringify(payload),
       });
 
-      if (!res.ok) throw new Error("Failed to submit");
+      if (!res.ok) {
+        const errorText = await res.text();
+        throw new Error(errorText || `Failed to submit (${res.status})`);
+      }
 
       setSubmitted(true);
       setForm(INITIAL);
     } catch (err) {
+      console.error("Contact form submission failed:", err);
       alert("There was an error submitting the form. Please try again.");
     } finally {
       setSending(false);

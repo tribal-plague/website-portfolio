@@ -365,7 +365,7 @@ export default function Contact() {
         style={{ background: "#1A1917", color: "#F7F5F1" }}
       >
         <div className="max-w-6xl mx-auto grid md:grid-cols-12 gap-10">
-          <div className="md:col-span-3 pt-1">
+          <div className="md:col-span-3 flex items-start pt-9">
             <span
               className="text-[11px] tracking-[0.2em] uppercase"
               style={{ color: "#8A877F" }}
@@ -386,12 +386,12 @@ export default function Contact() {
                 to: "/about",
               },
               {
-                label: "Behance Portfolio",
+                label: "Portfolio",
                 desc: "Selected visual work and case studies.",
-                href: CONTACT.behance,
+                to: "/portfolio",
               },
             ].map((item) => (
-              <div key={item.label} className={item !== [{ label: "Work Experience", desc: "7 years across 4 companies and 3 cities.", to: "/experience" }][0] ? "md:pl-0" : ""}>
+              <div key={item.label} className="px-6 py-8 border border-border/40 rounded-sm">
                 <p
                   className="text-[11px] tracking-[0.15em] uppercase mb-3"
                   style={{ color: "#8A877F" }}

@@ -68,10 +68,10 @@ export default function Portfolio() {
             className="font-extrabold uppercase leading-[0.88] tracking-[-0.02em] mb-10"
             style={{ fontSize: "clamp(3rem, 9vw, 7.5rem)" }}
           >
-            Selected
+            My
             <br />
             <span className="font-normal" style={serifItalic}>
-              work.
+              works.
             </span>
           </h1>
           <p className="text-lg text-muted-foreground leading-relaxed max-w-lg" style={serif}>
@@ -166,8 +166,7 @@ export default function Portfolio() {
               See more work
             </p>
             <p className="text-xl leading-relaxed max-w-sm" style={serif}>
-              The full archive lives on Behance — including process work,
-              sketches, and extended case studies.
+              The full archive lives on Behance.
             </p>
           </div>
           <div className="flex flex-col sm:flex-row gap-3 shrink-0">

@@ -69,9 +69,8 @@ export default function Root() {
               </nav>
 
               <a
-                href="https://www.dropbox.com/scl/fi/8is8bk32b16514vuthiy0/Shreesh_Singh_Design_Lead.pdf?rlkey=3hyip2ebpv9heogv59bsecxgh&st=bhiptzfe&dl=1"
-                target="_blank"
-                rel="noopener noreferrer"
+                href="/Shreesh_Singh_Design_Lead.pdf"
+                download="Shreesh Singh - Design Lead - 7+ years.pdf"
                 className="hidden md:inline-flex items-center gap-2 text-xs tracking-[0.18em] uppercase bg-foreground text-background px-7 py-4 hover:opacity-80 transition-opacity"
               >
                 Download Resume
@@ -105,9 +104,8 @@ export default function Root() {
               </div>
               <div className="pt-6 mt-4 border-t border-border/70">
                 <a
-                  href="https://www.dropbox.com/scl/fi/8is8bk32b16514vuthiy0/Shreesh_Singh_Design_Lead.pdf?rlkey=3hyip2ebpv9heogv59bsecxgh&st=bhiptzfe&dl=1"
-                  target="_blank"
-                  rel="noopener noreferrer"
+                  href="/Shreesh_Singh_Design_Lead.pdf"
+                  download="Shreesh Singh - Design Lead - 7+ years.pdf"
                   className="inline-flex w-full items-center justify-center gap-2 text-xs tracking-[0.18em] uppercase bg-foreground text-background px-7 py-4 hover:opacity-80 transition-opacity"
                 >
                   Download Resume

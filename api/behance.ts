@@ -1,5 +1,6 @@
-const BEHANCE_URL = 'https://www.behance.net/shreeshvikramsingh';
-const FETCH_TIMEOUT_MS = 8000;
+const BEHANCE_BASE = 'https://www.behance.net/shreeshvikramsingh';
+const FETCH_TIMEOUT_MS = 15000;
+const MAX_PAGES = 5;
 
 type BehanceProject = {
   id: string;
@@ -26,7 +27,7 @@ function buildDateMap(html: string): Map<string, string> {
   return map;
 }
 
-function parseBehanceHtml(html: string): BehanceProject[] {
+function parsePage(html: string): { projects: BehanceProject[]; nextCursor: string | null } {
   const projects: BehanceProject[] = [];
   const seenIds = new Set<string>();
   const dateMap = buildDateMap(html);
@@ -39,12 +40,12 @@ function parseBehanceHtml(html: string): BehanceProject[] {
     if (seenIds.has(id)) continue;
     seenIds.add(id);
 
-    const s = Math.max(0, m.index - 800);
-    const e = Math.min(html.length, m.index + 800);
+    const s = Math.max(0, m.index - 1500);
+    const e = Math.min(html.length, m.index + 1500);
     const slice = html.slice(s, e);
 
     const thumbMatch = slice.match(
-      /https:\/\/mir-s3-cdn-cf\.behance\.net\/projects\/\d+\/[A-Za-z0-9]+\.[^"'\s>]+\.(?:jpg|jpeg|png|webp)/
+      /https:\/\/(?:mir-s3-cdn-cf|mir-cdn|[a-z0-9-]+\.behance\.net|mir\.cdn\.behance\.net)\/projects\/\d+\/[A-Za-z0-9]+[^"'\s>]*\.(?:jpg|jpeg|png|webp)/i
     );
     if (!thumbMatch) continue;
 
@@ -64,8 +65,20 @@ function parseBehanceHtml(html: string): BehanceProject[] {
     });
   }
 
-  return projects;
+  // Find the next page cursor: href="/shreeshvikramsingh?after=CURSOR"
+  const cursorMatch = html.match(/href="\/shreeshvikramsingh\?after=([A-Za-z0-9+/%=]+)"/);
+  const nextCursor = cursorMatch ? decodeURIComponent(cursorMatch[1]) : null;
+
+  return { projects, nextCursor };
 }
+
+const FETCH_HEADERS = {
+  'User-Agent':
+    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+  Accept:
+    'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
+  'Accept-Language': 'en-US,en;q=0.9',
+};
 
 export default async function handler(req: any, res: any) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -76,30 +89,46 @@ export default async function handler(req: any, res: any) {
   const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
 
   try {
-    const response = await fetch(BEHANCE_URL, {
-      signal: controller.signal,
-      headers: {
-        'User-Agent':
-          'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-        Accept:
-          'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
-        'Accept-Language': 'en-US,en;q=0.9',
-      },
-    });
+    const allProjects: BehanceProject[] = [];
+    const seenIds = new Set<string>();
+    let url = BEHANCE_BASE;
+    let pages = 0;
 
-    clearTimeout(timer);
-
-    if (!response.ok) {
-      return res.status(500).json({
-        error: `Behance returned HTTP ${response.status}`,
-        projects: [],
+    while (pages < MAX_PAGES) {
+      const response = await fetch(url, {
+        signal: controller.signal,
+        headers: FETCH_HEADERS,
       });
+
+      if (!response.ok) {
+        if (pages === 0) {
+          clearTimeout(timer);
+          return res.status(500).json({
+            error: `Behance returned HTTP ${response.status}`,
+            projects: [],
+          });
+        }
+        break;
+      }
+
+      const html = await response.text();
+      const { projects, nextCursor } = parsePage(html);
+
+      for (const p of projects) {
+        if (!seenIds.has(p.id)) {
+          seenIds.add(p.id);
+          allProjects.push(p);
+        }
+      }
+
+      pages++;
+
+      if (!nextCursor) break;
+      url = `${BEHANCE_BASE}?after=${encodeURIComponent(nextCursor)}`;
     }
 
-    const html = await response.text();
-    const projects = parseBehanceHtml(html);
-
-    return res.status(200).json({ projects });
+    clearTimeout(timer);
+    return res.status(200).json({ projects: allProjects });
   } catch (err: any) {
     clearTimeout(timer);
     const message = err?.name === 'AbortError' ? 'Behance fetch timed out' : String(err);

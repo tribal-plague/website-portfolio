@@ -69,7 +69,7 @@ export default function Root() {
               </nav>
 
               <a
-                href="/Shreesh_Singh_Design_Lead.pdf"
+                href="/Shreesh Singh - Design Lead - 7+ years.pdf"
                 download="Shreesh Singh - Design Lead - 7+ years.pdf"
                 className="hidden md:inline-flex items-center gap-2 text-xs tracking-[0.18em] uppercase bg-foreground text-background px-7 py-4 hover:opacity-80 transition-opacity"
               >
@@ -104,7 +104,7 @@ export default function Root() {
               </div>
               <div className="pt-6 mt-4 border-t border-border/70">
                 <a
-                  href="/Shreesh_Singh_Design_Lead.pdf"
+                  href="/Shreesh Singh - Design Lead - 7+ years.pdf"
                   download="Shreesh Singh - Design Lead - 7+ years.pdf"
                   className="inline-flex w-full items-center justify-center gap-2 text-xs tracking-[0.18em] uppercase bg-foreground text-background px-7 py-4 hover:opacity-80 transition-opacity"
                 >

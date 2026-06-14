@@ -27,7 +27,7 @@ export default function Experience() {
               Seven years
               <br />
               <span className="font-normal" style={serifItalic}>
-                of craft.
+                of experience.
               </span>
             </h1>
           </div>

@@ -1,6 +1,6 @@
 import { Link } from "react-router";
 import { ArrowUpRight } from "lucide-react";
-import { serifItalic, serif, EXPERIENCES, CONTACT } from "../data";
+import { serifItalic, serif, sans, EXPERIENCES, CONTACT } from "../data";
 import { useBehanceProjects } from "../hooks/useBehanceProjects";
 
 export default function Home() {
@@ -23,19 +23,22 @@ export default function Home() {
 
         {/* Headline */}
         <h1
-          className="font-extrabold leading-[0.88] tracking-[-0.02em] mb-7 text-foreground"
-          style={{ fontSize: "clamp(3.5rem, 9vw, 7rem)" }}
+          className="mb-7 max-w-[12ch] leading-[0.82] tracking-[-0.06em] text-foreground uppercase"
+          style={{ fontSize: "clamp(3.5rem, 9.5vw, 7.6rem)" }}
         >
-          Hi. I&apos;m Shreesh,
-          <br />
-          and I design stuff.
+          <span className="block font-extrabold" style={sans}>
+            Hi. I&apos;m Shreesh,
+          </span>
+          <span className="block font-normal" style={serifItalic}>
+            and I design stuff.
+          </span>
         </h1>
 
         <p
           className="text-lg text-muted-foreground mb-12 max-w-md leading-relaxed"
           style={serif}
         >
-          Brands, interfaces, campaigns, motion — crafted across 7+ years and four industries.
+          Brands, interfaces, campaigns, motion — 7 years of work experience across four industries.
         </p>
 
         {/* CTA buttons */}

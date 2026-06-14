@@ -89,24 +89,31 @@ export default function Root() {
         </div>
 
         {menuOpen && (
-          <div className="md:hidden bg-background border-b border-border px-6 pb-5 pt-1 flex flex-col gap-5">
-            {NAV_LINKS.map((link) => (
-              <Link
-                key={link.label}
-                to={link.href}
-                className="text-[11px] tracking-[0.18em] uppercase text-muted-foreground hover:text-foreground text-left transition-colors"
-              >
-                {link.label}
-              </Link>
-            ))}
-            <a
-              href="https://www.dropbox.com/scl/fi/8is8bk32b16514vuthiy0/Shreesh_Singh_Design_Lead.pdf?rlkey=3hyip2ebpv9heogv59bsecxgh&st=bhiptzfe&dl=1"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 text-xs tracking-[0.18em] uppercase bg-foreground text-background px-7 py-4 hover:opacity-80 transition-opacity"
-            >
-              Download Resume
-            </a>
+          <div className="md:hidden fixed inset-x-0 top-[60px] bottom-0 z-40 bg-background border-b border-border px-6 py-8 flex items-center">
+            <div className="w-full max-w-md mx-auto">
+              <div className="divide-y divide-border/70">
+                {NAV_LINKS.map((link) => (
+                  <div key={link.label} className="py-5 first:pt-0 last:pb-0">
+                    <Link
+                      to={link.href}
+                      className="block text-[11px] tracking-[0.18em] uppercase text-muted-foreground hover:text-foreground text-center transition-colors"
+                    >
+                      {link.label}
+                    </Link>
+                  </div>
+                ))}
+              </div>
+              <div className="pt-6 mt-4 border-t border-border/70">
+                <a
+                  href="https://www.dropbox.com/scl/fi/8is8bk32b16514vuthiy0/Shreesh_Singh_Design_Lead.pdf?rlkey=3hyip2ebpv9heogv59bsecxgh&st=bhiptzfe&dl=1"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex w-full items-center justify-center gap-2 text-xs tracking-[0.18em] uppercase bg-foreground text-background px-7 py-4 hover:opacity-80 transition-opacity"
+                >
+                  Download Resume
+                </a>
+              </div>
+            </div>
           </div>
         )}
       </header>
